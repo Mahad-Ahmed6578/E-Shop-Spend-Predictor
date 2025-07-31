@@ -1,26 +1,32 @@
 import streamlit as st
-import joblib
+import pandas as pd
 import numpy as np
+import joblib
+from utils import evaluate_prediction
 
-# Title and description
-st.set_page_config(page_title="E-Commerce Linear Regression", layout="centered")
-st.title("📊 E-Commerce Purchase Predictor")
-st.markdown("Predict the yearly spending of a customer based on their online activity.")
-
-# Load the trained model
+# Load model
 model = joblib.load("lm.pkl")
 
-# User inputs for all 4 features
-st.subheader("Enter Customer Info:")
-avg_session_length = st.number_input("🕒 Avg. Session Length", min_value=0.0, format="%.2f")
-time_on_app = st.number_input("📱 Time on App (minutes)", min_value=0.0, format="%.2f")
-time_on_website = st.number_input("🌐 Time on Website (minutes)", min_value=0.0, format="%.2f")
-membership_length = st.number_input("📅 Length of Membership (years)", min_value=0.0, format="%.2f")
+st.title("🛒 E-Shop Spend Predictor")
+st.write("Predict how much a customer will spend yearly based on their behavior.")
 
-# Predict button
-if st.button("Predict Yearly Spending 💰"):
-    # Make prediction
-    input_data = np.array([[avg_session_length, time_on_app, time_on_website, membership_length]])
-    prediction = model.predict(input_data)
-    
-    st.success(f"🤑 Predicted Yearly Amount Spent: **${prediction[0]:,.2f}**")
+# Input features
+avg_session_length = st.number_input("Average Session Length", 0.0, 40.0, 32.0)
+time_on_app = st.number_input("Time on App", 0.0, 40.0, 12.0)
+time_on_website = st.number_input("Time on Website", 0.0, 40.0, 38.0)
+length_of_membership = st.number_input("Length of Membership (in years)", 0.0, 10.0, 4.0)
+
+# Make prediction
+input_data = pd.DataFrame([[avg_session_length, time_on_app, time_on_website, length_of_membership]],
+                          columns=["Avg. Session Length", "Time on App", "Time on Website", "Length of Membership"])
+
+if st.button("Predict Spending"):
+    prediction = model.predict(input_data)[0]
+    st.success(f"Predicted Yearly Spending: ${prediction:.2f}")
+
+    # Optional: Add known actual value to test
+    actual_value = st.number_input("Enter Actual Value (Optional)", 0.0, 1000.0, 587.0)
+    if actual_value > 0:
+        results = evaluate_prediction(actual_value, prediction)
+        st.write("📊 **Evaluation Metrics**")
+        st.json(results)
