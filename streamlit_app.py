@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-from utils import evaluate_prediction
+
 
 # Load model
 model = joblib.load("lm.pkl")
