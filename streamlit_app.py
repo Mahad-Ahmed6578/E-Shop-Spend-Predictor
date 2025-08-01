@@ -24,9 +24,3 @@ if st.button("Predict Spending"):
     prediction = model.predict(input_data)[0]
     st.success(f"Predicted Yearly Spending: ${prediction:.2f}")
 
-    # Optional: Add known actual value to test
-    actual_value = st.number_input("Enter Actual Value (Optional)", 0.0, 1000.0, 587.0)
-    if actual_value > 0:
-        results = evaluate_prediction(actual_value, prediction)
-        st.write("📊 **Evaluation Metrics**")
-        st.json(results)
